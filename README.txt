@@ -129,7 +129,7 @@ class BojacksController < ApplicationController
 
   VERTICALS = [:books, :games, :other_crap]
 
-  args_for :my_action
+  args_for :my_action do
     # Required arg called :vertical.  (If absent, raises ActionArgs::ArgumentError.)
     # Value is a Symbol (converted from supplied String).
     # Ensure value's validity or raise ActionArgs::ArgumentError.
@@ -247,7 +247,7 @@ args.exceptions instead?):
   def my_action
     if !args.valid?
       # action-specific exception-handling code...
-      errors_str = @args.errors.map(&:to_s).join("\n")
+      errors_str = args.errors.map(&:to_s).join("\n")
       render_json(:success   => false,
                   :exception => "Some bojackedness occurred: #{errors_str}")
     else
