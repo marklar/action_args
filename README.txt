@@ -98,13 +98,13 @@ Or, "Pulling Args from Params" (http://www.youtube.com/watch?v=3WngGeI9lnA).
 === Plugin ===
 
 First, include the plugin:
-{{{
+<pre>
 #!ruby
 # app/controllers/application.rb
 class ApplicationController < ActionController::Base
   include ActionController::ArgyBargy
 end
-}}}
+</pre>
 
 
 === Declare Your Args ===
