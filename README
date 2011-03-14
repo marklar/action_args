@@ -1,0 +1,42 @@
+
+ActionArgs is a Ruby on Rails plugin for wrangling your Controller actions' parameters.
+
+N.B. This code set is INCOMPLETE.  It's missing one ActionController mixin.
+
+Notes on implementation...
+
+ActionArgs Class Hierarchy
+
+== EXCEPTIONS ==
+
+::StandardError (core Ruby)
+   \_ ArgumentError
+   \_ ConfigError
+
+
+== CONFIG ==
+
+HashCfg  (for #args_for)
+ \_ OptHashCfg  (for #opt_hash)
+ \_ ReqHashCfg  (for #req_hash)
+
+ArgCfg
+ \_ OptArgCfg  (for #opt)
+ \_ ReqArgCfg  (for #req)
+
+
+== ACCESS ==
+
+Accessor  (for #args_for, #req_hash)
+ \_ OptAccessor     (for #opt_hash)
+
+Arg
+ \_ OptArg  (for #opt)
+ \_ ReqArg  (for #req)
+
+
+--------
+
+In Controller plugin:
+  #args_for    : creates a HashCfg
+  #access_args : creates corresponding Accessor
