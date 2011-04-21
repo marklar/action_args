@@ -9,7 +9,7 @@ module ActionArgs
     def initialize(params, config)
       @params = params
       @config = config
-      @errors = []
+      @errors = {}
       @args = @params ? compute_args : nil
     end
 
