@@ -131,7 +131,9 @@ The goal of ActionArgs is to solve these problems.
 <a name="use"></a>
 ## How to Use It
 
-Or, "Pulling Args from Params" (http://www.youtube.com/watch?v=3WngGeI9lnA).
+Or, ["Pulling Args from Params"][#4].
+
+[4]: http://www.youtube.com/watch?v=3WngGeI9lnA
 
 ### Plugin
 
