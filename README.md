@@ -48,7 +48,8 @@ end
 [3]: #exceptions
 
 
-## Motivation <a name="motivation"></a>
+<a name="motivation"></a>
+## Motivation
 
 Controller actions are special methods in that they interface with
 external programs.  In particular:
@@ -127,7 +128,8 @@ and how.
 
 The goal of ActionArgs is to solve these problems.
 
-## How to Use It  <a name="use"></a>
+<a name="use"></a>
+## How to Use It
 
 Or, "Pulling Args from Params" (http://www.youtube.com/watch?v=3WngGeI9lnA).
 
@@ -208,7 +210,8 @@ class BojacksController < ApplicationController
 end
 ```
 
-## Exceptions  <a name="exceptions"></a>
+<a name="exceptions"></a>
+## Exceptions
 
 But wait, what if something goes wrong?  What if a parameter
 declaration makes no sense?  Luckily, ActionArgs can often notice this
