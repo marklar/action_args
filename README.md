@@ -216,14 +216,14 @@ end
 ## Exceptions
 
 But wait, what if something goes wrong?  What if a parameter
-declaration makes no sense?  Luckily, ActionArgs can often notice this
-and make you fix it.
+declaration actually makes no sense?  Or what if the proper arguments
+aren't passed at runtime?
 
 ### ActionArgs::ConfigError
 
 If there's an error in an `#args_for` method (which is detectable by
 the library), then your app server won't even start up.  ActionArgs
-will raise an exception of type `ConfigError`, explaining what it
+will raise an exception of type `ActionArgs::ConfigError`, explaining what it
 thinks you did wrong.  Here are some examples of invalid declarations:
 
 ```ruby
