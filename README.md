@@ -87,7 +87,7 @@ Or, "Pulling Args from Params" (http://www.youtube.com/watch?v=3WngGeI9lnA).
 
 First, include the plugin:
 
-```
+```ruby
 # app/controllers/application.rb
 class ApplicationController < ActionController::Base
   include ActionController::ArgyBargy
@@ -106,7 +106,7 @@ Then, in your controller, you may:
 
 Here's an excessively-commented example:
 
-```
+```ruby
 # app/controllers/bojacks_controller.rb
 class BojacksController < ApplicationController
 
@@ -172,7 +172,7 @@ is detectable by the library --, then your app server will never start
 up.  ActionArgs will raise an exception of type ConfigError,
 explaining what it thinks you did wrong.  Some bojacked examples:
 
-```
+```ruby
 args_for :action1
   req(:foo).as(:int)
   opt(:foo).as(:int)                # repeated arg.
@@ -211,7 +211,7 @@ options:
   ActionArgs errors, then you'll need to add to your
   args_for() declaration, like this:
 
-```
+```ruby
 args_for :my_action, :raise_p => false do
   ...
 end
@@ -222,7 +222,7 @@ called, and you may ask of the args object what happened by inspecting
 the exceptions it gathered up (args.errors -- yes, yes, it really should
 be named args.exceptions instead):
 
-```
+```ruby
 def my_action
   if !args.valid?
     # action-specific exception-handling code...
