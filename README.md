@@ -219,7 +219,7 @@ ActionArgs tries to cover the most common patterns.
 Using `#as`, you may declare an argument to be any of these types:
 
 * simple
-  * `:bool`          (false: 'f', 'false', '0'.  true: 't', 'true', '1'.)
+  * `:bool`          (false: `'f'`, `'false'`, `'0'`.  true: `'t'`, `'true'`, `'1'`.)
   * `:float`
   * `:int`
   * `:positive_int`  (i.e. >  0)
@@ -260,8 +260,8 @@ either as a lambda/proc or as a symbol (i.e. method name).  As with
 
 Since checking for set/enum membership is a very common validation
 case, ActionArgs also provides a special `#validate_in` method, which
-takes either an Array or a Range.  (It should probably also take a
-Set; note to self.)  Like this:
+takes either an Array or a Range.  (Note to self: it should probably
+also accept a Set.)  Like this:
 
 ```ruby
 req(:minutes).as(:unsigned_int).validate_in(0..59)
@@ -330,7 +330,7 @@ options:
   your `#args_for` declaration, like this:
 
 ```ruby
-args_for :my_action, :raise_p => false do
+args_for :my_action, raise_p: false do
   ...
 end
 ```
