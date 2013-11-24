@@ -258,10 +258,11 @@ You may also specify a validation function using `#validate`, again
 either as a lambda/proc or as a symbol (i.e. method name).  As with
 `#munge`, do so only once per parameter.
 
-Since checking for set/enum membership is a very common validation
-case, ActionArgs also provides a special `#validate_in` method, which
-takes either an Array or a Range.  (Note to self: it should probably
-also accept a Set.)  Like this:
+However, you probably won't. Since checking for set/enum membership is
+a very common validation case, ActionArgs also provides a special
+`#validate_in` method which you'll probably usually use.
+`#validate_in` takes either an Array or a Range.  (Note to self: it
+should probably also accept a Set.)  Like this:
 
 ```ruby
 req(:minutes).as(:unsigned_int).validate_in(0..59)
@@ -301,11 +302,10 @@ args_for :action3
   opt(:id).as(:int).default(true)
 end
     
-# The default value (:books) doesn't validate (because the validate
-# method is mistakenly looking for a String, not a Symbol).
+# The default value (:books) doesn't validate (because `#validate_in`
+# is mistakenly looking for a String, not a Symbol).
 args_for :action4
-  opt(:vertical).as(:symbol).default(:books).
-    validate {|sym| ['books', 'games'].include? sym }
+  opt(:vertical).as(:symbol).default(:books).validate_in(['books', 'games'])
 end
 ````
 
