@@ -3,7 +3,7 @@
 ActionArgs is a Ruby on Rails plugin.  A declarative DSL for
 your controller actions.
 
-A quick "examplet":
+A quick _examplet_:
 
 ```ruby
 # First, declare the formal parameters for your action...
@@ -16,10 +16,10 @@ args_for :my_action do
   #
   # It must be between 0-23 inclusive, else an ActionArgs::ArgumentError.
   #
-  req(:hours).as(:int).validate {|h| (0..23).cover? h }
+  req(:hours).as(:int).validate_in(0..23)
 
   # Same deal, basically, except "minutes".
-  req(:minutes).as(:int).validates {|m| (0..59).cover? m }
+  req(:minutes).as(:int).validate_in(0..59)
 
   # We may get an arg "filter", a Symbol.
   # If provided, downcase it.
@@ -167,7 +167,7 @@ class BojacksController < ApplicationController
     # Required arg called :vertical.  (If absent: ActionArgs::ArgumentError.)
     # Value is a Symbol (converted from supplied String).
     # Ensure value's validity or raise ActionArgs::ArgumentError.
-    req(:vertical).as(:symbol).validate {|s| VERTICALS.include? s }
+    req(:vertical).as(:symbol).validate_in(VERTICALS)
 
     # Optional string arg called :filter.
     # If provided, its value is downcased automatically.
@@ -189,11 +189,11 @@ class BojacksController < ApplicationController
     
       # Required int (Fixnum, really) called :offset.
       # Must be non-negative (or raises ActionArgs::ArgumentError).
-      req(:offset).as(:int).validate {|i| i >= 0 }
+      req(:offset).as(:unsigned_int)
     
       # Required int called :limit.
       # Must be positive (or raises ActionArgs::ArgumentError).
-      req(:limit).as(:int). validate {|i| i > 0  }
+      req(:limit).as(:positive_int).
     end
     
     # Optional boolean arg called :show_related_p.
@@ -210,6 +210,61 @@ class BojacksController < ApplicationController
   end
 
 end
+```
+
+ActionArgs tries to cover the most common patterns.
+
+#### Types using `#as`
+
+Using `#as`, you may declare an argument to be any of these types:
+
+* simple
+  * `:bool`          (false: 'f', 'false', '0'.  true: 't', 'true', '1'.)
+  * `:float`
+  * `:int`
+  * `:positive_int`  (i.e. >  0)
+  * `:unsigned_int`  (i.e. >= 0)
+  * `:string`        (_default_)
+  * `:symbol`        (great for enums)
+* arrays
+  * `:float_array`
+  * `:int_array`
+  * `:positive_int_array`
+  * `:unsigned_int_array`
+
+If you declare something as `:positive_int` or `:unsigned_int`, or an
+`_array` of either of those types, then ActionArgs essentially handles
+part of your validation for you.  However, you are not restricted from
+providing additional validation criteria.
+
+You are not required to assign a type using `#as`.  If you don't
+declare a type, it will simply remain a String.
+
+(You may wonder why there aren't corresponding `_array` types for all
+simple types.  Just haven't gotten there; could do.)
+
+#### Munging using `#munge`
+
+You may specify how to normalize an argument by providing a "munge"
+function, specified either as a proc/lambda, or as a symbol
+(i.e. method name).
+
+You may specify only one "munge" function.  If you call `#munge` more
+than once, the last one "wins".
+
+#### Validation using `#validate` or `#validate_in`
+
+You may also specify a validation function using `#validate`, again
+either as a lambda/proc or as a symbol (i.e. method name).  As with
+`#munge`, do so only once per parameter.
+
+Since checking for set/enum membership is a very common validation
+case, ActionArgs also provides a special `#validate_in` method, which
+takes either an Array or a Range.  (It should probably also take a
+Set; note to self.)  Like this:
+
+```ruby
+req(:minutes).as(:unsigned_int).validate_in(0..59)
 ```
 
 <a name="exceptions"></a>
