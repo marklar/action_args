@@ -62,13 +62,12 @@ module ActionArgs
     private
 
     # May raise.
-    # :: Array | Range -> Array|Range
+    # :: T implements include? -> T
     def get_valid_values(values)
-      case values
-      when Array, Range
+      if values.respond_to?(:include?)
         values
       else
-        raise ConfigError, '#validate_in takes either an Array or a Range.' +
+        raise ConfigError, '#validate_in takes only objects that respond to #include?.' +
           "  Not this: #{values.inspect}"
       end
     end

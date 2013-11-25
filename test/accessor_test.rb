@@ -22,6 +22,23 @@ class AccessorTest < Test::Unit::TestCase
     end
   end
 
+  def test_foo
+    @cfg = HashCfg.new do
+      at_least_one_of do
+        opt(:listing_id).as(:positive_int)
+        opt_hash(:sku) do
+          req(:id).as(:positive_int)
+        end
+      end
+    end
+    params = {
+      # :listing_id => "3",
+      :sku => {:id => nil}
+    }
+    acc = Accessor.new(params, @cfg)
+    assert !acc.valid?
+  end
+
   def test_not_valid_if_missing_all_at_least_one_ofs
     acc = Accessor.new({:id => '1', :my_string => 'FOO'}, @cfg)
     assert !acc.valid?
