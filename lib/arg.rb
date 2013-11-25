@@ -159,8 +159,8 @@ module ActionArgs
     def nums_from_csv_str(validate, convert)
       num_strs = @str.gsub(' ', '').split(',')
       unless num_strs.all? {|s| send(validate, s) }
-        raise (ArgumentError,
-               "In arg value #{@s}, not all members are of valid type.")
+        raise ArgumentError,
+          "In arg value #{@s}, not all members are of valid type."
       end
       num_strs.map {|s| s.send(convert) }
     end
