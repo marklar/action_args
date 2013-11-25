@@ -44,6 +44,13 @@ module ActionArgs
       end
     end
 
+    def to_hash
+      @args.keys.inject({}) do |m, k|
+        m[k] = self[k]
+        m
+      end
+    end
+
     #--------
     private
 
@@ -53,7 +60,7 @@ module ActionArgs
     # :: () -> ()
     def validate_non_null_sets
       @config.non_null_sets.each_with_index do |set, idx|
-        unless set.any? {|name| @args[name].provided? }
+        unless set.any? {|name| @args[name] && @args[name].provided? }
           add_error("non_null_set_#{idx}".to_sym,
                     "Must provide at least one of: #{set.inspect}")
         end
@@ -74,23 +81,49 @@ module ActionArgs
       #   - Arg : for "simple" arguments
       #   - Accessor : for hashes
       @config.inject({}) do |memo, cfg|
-        klass = case cfg
-                  # Order matters here...
-                when OptHashCfg then OptAccessor
-                when HashCfg    then Accessor
-                  # ...and here.
-                when OptArgCfg  then OptArg
-                when ArgCfg     then ReqArg
-                else
-                  raise ConfigError, 'Should not get here.'
-                end
         begin
-          memo[cfg.name] = klass.new(@params[cfg.name], cfg)
+          # Use @params to create: Accessor|Arg.
+          memo[cfg.name] = create_either_accessor_or_arg(cfg)
+          # If Accessor, might have own errors.  Note them.
+          note_any_accessor_errors(memo[cfg.name])
         rescue Exception => e
           memo[cfg.name] = nil
           @errors[cfg.name] = e
         end
         memo
+      end
+    end
+
+    # May raise.
+    def create_either_accessor_or_arg(cfg)
+      klass =
+        case cfg
+          # Order matters here...
+        when OptHashCfg then OptAccessor
+        when HashCfg    then Accessor
+          # ...and here.
+        when OptArgCfg  then OptArg
+        when ArgCfg     then ReqArg
+        else
+          raise ConfigError, 'Should not get here.'
+        end
+      klass.new(@params[cfg.name], cfg)
+    end
+
+    # Possibly modify @errors.
+    # May raise.
+    # :: Accessor|Arg >> ()
+    def note_any_accessor_errors(acc_or_arg)
+      case acc_or_arg
+      when Accessor
+        if !acc_or_arg.valid?
+          @errors[cfg.name] = acc_or_arg.errors
+        end
+      when Arg
+        # no-op
+      else
+        raise(RuntimeError,
+              "Should be either Accessor|Arg: #{acc_or_arg.inspect}")
       end
     end
 

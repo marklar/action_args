@@ -10,10 +10,13 @@ class HashCfgTest < Test::Unit::TestCase
       at_least_one_of do
         opt(:bar).as(:int)
         opt(:baz).as(:int)
+        opt_hash(:quux) do
+          req(:id).as(:positive_int)
+        end
       end
     end
     assert cfg
-    assert_equal [[:bar, :baz]], cfg.non_null_sets
+    assert_equal [[:bar, :baz, :quux]], cfg.non_null_sets
   end
 
   def test_bobo_at_least_one_of_members_cannot_be_declared_req
