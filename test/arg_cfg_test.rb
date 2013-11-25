@@ -1,5 +1,4 @@
-require 'test/unit'
-require File.expand_path(File.dirname(__FILE__) + '/../init')
+require 'test_helper'
 
 class ArgCfgTest < Test::Unit::TestCase
 
