@@ -75,8 +75,9 @@ module ActionArgs
     # :: -> unit | raises
     def validate
       unless valid?
-        raise(ArgumentError,
-              "Arg #{@cfg.name.inspect}'s value (#{@value.inspect}) does not validate.")
+        n = @cfg.name.inspect
+        v = @value.inspect
+        raise(ArgumentError, "Arg #{n}'s value (#{v}) does not validate.")
       end
     end
 
@@ -158,7 +159,8 @@ module ActionArgs
     def nums_from_csv_str(validate, convert)
       num_strs = @str.gsub(' ', '').split(',')
       unless num_strs.all? {|s| send(validate, s) }
-        raise ArgumentError, "In arg value #{@s}, not all members are of valid type."
+        raise (ArgumentError,
+               "In arg value #{@s}, not all members are of valid type.")
       end
       num_strs.map {|s| s.send(convert) }
     end
@@ -178,7 +180,8 @@ module ActionArgs
       @cleaned_num_str ||= sans_whitespace_and_commas
     end
     
-    # String#to_i and #to_f stop parsing when they sees a space (after the first digit).
+    # String#to_i and #to_f stop parsing when they sees a space
+    # (after the first digit).
     # Does not support the use of '.' as a 1000s-separator.
     # :: -> string
     def sans_whitespace_and_commas
@@ -187,14 +190,16 @@ module ActionArgs
     
     # :: string -> exc  (doesn't raise)
     def not_string_exc(str)
-      ArgumentError.new("Arg #{@cfg.name.inspect}'s value must be a String: #{str.inspect}.")
+      n = @cfg.name.inspect
+      v = str.inspect
+      ArgumentError.new("Arg #{n}'s value must be a String: #{v}.")
     end
 
     # :: -> bool
     def valid_bool_str?(str)
       BOOL_STRS.include?(str)
     end
-
+    
   end
 
 end

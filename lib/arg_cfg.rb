@@ -10,7 +10,8 @@ module ActionArgs
     # ARRAY_TYPES = SIMPLE_TYPES.map {|t| (t.to_s + '_array').to_sym }
     # ToDo: add support for :float_array.
     #   How to support string/symbol arrays?  What's the separator?
-    ARRAY_TYPES = [:int_array, :positive_int_array, :unsigned_int_array, :float_array]
+    ARRAY_TYPES = [:int_array, :positive_int_array, :unsigned_int_array,
+                   :float_array]
     TYPE_NAMES = SIMPLE_TYPES + ARRAY_TYPES
     
     attr_reader :name, :type_name, :munger, :validator, :valid_values

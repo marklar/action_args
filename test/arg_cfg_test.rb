@@ -137,8 +137,8 @@ class ArgCfgTest < Test::Unit::TestCase
 
   # type
   def test_default_type_is_string
-    assert_equal ArgCfg, @cfg.class
-    assert_equal :string,  @cfg.type_name
+    assert_equal ArgCfg,  @cfg.class
+    assert_equal :string, @cfg.type_name
   end
 
   def test_good_type_names
