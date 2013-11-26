@@ -16,12 +16,13 @@ module ActionArgs
     
     attr_reader :name, :type_name, :munger, :validator, :valid_values
     
-    def initialize(name)
-      unless name.is_a? Symbol
+    def initialize(param_name)
+      unless param_name.is_a? Symbol
         raise ConfigError, "Argument name #{name.inspect} must be symbol."
       end
-      @name = name
+      @name = param_name
       @type_name = :string  # default type.  override w/ #as.
+      @munger = ->(b) {b}   # default munger (identify).  override w/ #munge
     end
 
     # :: symbol -> ArgCfg (mutated)
@@ -30,9 +31,11 @@ module ActionArgs
       when *TYPE_NAMES
         @type_name = type_name
       when Symbol
-        raise ConfigError, "Type name #{type_name.inspect} not among known types."
+        s = type_name.inspect
+        raise ConfigError, "Type name #{s} not among known types."
       else
-        raise ConfigError, "Type name #{type_name.inspect} must be a symbol."
+        s = type_name.inspect
+        raise ConfigError, "Type name #{s} must be a Symbol."
       end
       self
     end
@@ -68,8 +71,8 @@ module ActionArgs
       if values.respond_to?(:include?)
         values
       else
-        raise ConfigError, '#validate_in takes only objects that respond to #include?.' +
-          "  Not this: #{values.inspect}"
+        raise ConfigError, '#validate_in takes only objects that ' +
+          "respond to #include?.  Not this: #{values.inspect}"
       end
     end
 

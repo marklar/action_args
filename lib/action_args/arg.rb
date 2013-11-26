@@ -11,6 +11,8 @@ module ActionArgs
     BOOL_STRS  = FALSE_STRS + TRUE_STRS
 
     # :: string|nil, ArgCfg -> Arg
+    # str: the value passed in for this parameter
+    # cfg: the user-provided rules (type, munging, validationg) for this argument
     def initialize(str, cfg)
       @cfg = cfg
       @str = str_from_input(str)  # may raise
@@ -18,15 +20,22 @@ module ActionArgs
       validate
     end
 
+    # :: -> bool
+    # True if a non-nil value was provided for this parameter.
     def provided?
       !@str.nil?
     end
 
     # :: -> bool
+    # If a value was supplied for this parameter, return true if it passes
+    # all validation:
+    #   - is in range for type
+    #   - is among explicitly specified options
+    #   - passes validator function
     def valid?
       if !value.nil?
-        in_range? &&
-          among_valid_values? &&
+        in_range_for_type? &&
+          among_validate_in_values? &&
           (@cfg.validator ? @cfg.validator.call(value) : true)
       else
         true
@@ -37,14 +46,14 @@ module ActionArgs
     private
 
     # :: () -> bool
-    def among_valid_values?
+    def among_validate_in_values?
       vs = @cfg.valid_values
       !vs || vs.include?(@value)
     end
 
     # NOT DRY.  Same as in opt_arg_cfg.rb.
     # :: -> bool
-    def in_range?
+    def in_range_for_type?
       case @cfg.type_name
       when :positive_int
         value >  0
@@ -83,24 +92,16 @@ module ActionArgs
 
     # :: -> valid-type | raises
     def calc_value
-      if @cfg.munger
-        @cfg.munger.call(convert)
-      else
-        convert
-      end
+      @cfg.munger.call(to_type)
     end
 
     # :: -> valid-type | exc
-    def convert
+    # Takes (implicitly) the input String (@str) and returns a new value
+    # by converting it to the proper type (e.g. Bool, Int, Float, Symbol).
+    def to_type
       case @cfg.type_name
       when :bool
-        raise exc unless valid_bool_str?(@str)
-        case @str
-        when *FALSE_STRS
-          false
-        else
-          true
-        end
+        bool_from_str(@str.downcase)
       when :int, :positive_int, :unsigned_int
         raise exc unless valid_int_str?(cleaned_num_str)
         cleaned_num_str.to_i
@@ -118,6 +119,17 @@ module ActionArgs
         floats_from_csv_str
       else
         raise ConfigError, "Type not yet supported: #{@cfg.type_name}."
+      end
+    end
+
+    # :: s -> bool | raises
+    def bool_from_str(s)
+      raise exc unless valid_bool_str?(s)
+      case s
+      when *FALSE_STRS
+        false
+      else
+        true
       end
     end
 
@@ -156,13 +168,13 @@ module ActionArgs
       nums_from_csv_str(:valid_int_str?, :to_i)
     end
 
-    def nums_from_csv_str(validate, convert)
+    def nums_from_csv_str(validate, converter)
       num_strs = @str.gsub(' ', '').split(',')
       unless num_strs.all? {|s| send(validate, s) }
         raise ArgumentError,
           "In arg value #{@s}, not all members are of valid type."
       end
-      num_strs.map {|s| s.send(convert) }
+      num_strs.map {|s| s.send(converter) }
     end
     
     # :: string -> bool
