@@ -280,7 +280,9 @@ req(:some_string).munge {|s| s.gsub(' ', '_') }
 
 Or as a lambda:
 ```ruby
-req(:some_string).munge ->(s) { s.gsub(' ', '_') }
+some_reusable_lambda = ->(s) { s.gsub(' ', '_') }
+...
+req(:some_string).munge(some_reusable_lambda)
 ```
 
 It does not work to specify more than a single "munge" function per
