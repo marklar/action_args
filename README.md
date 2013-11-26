@@ -272,18 +272,23 @@ simple types.  Just haven't gotten there; could do.)
 You may specify how to normalize an argument by providing a "munge"
 function.
 
-If your munging is simply a unary instance method on the value, you
-may use just the :name of it, like this:
+If your munging is simply a unary instance method on the value, you may simply provide its name, like this:
 
 ```ruby
 req(:some_string).munge(:downcase)
 ```
+
+That will call `String#downcase` on the passed-in value.
 
 You may instead provide a block:
 
 ```ruby
 req(:some_string).munge {|s| s.gsub(' ', '_') }
 ```
+
+NB: Don't use `#gsub!` here, because what you want is the munge
+function's return value (which in the case of `#gsub!` might be
+`nil`), rather than its mutated argument.
 
 Or, if it's convenient for you, a lambda:
 
