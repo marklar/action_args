@@ -333,6 +333,7 @@ thinks you did wrong.  Here are some examples of invalid declarations:
 
 ```ruby
 # The arg :foo is specified twice.
+#
 args_for :action1
   req(:foo).as(:int)
   opt(:foo).as(:int)
@@ -341,21 +342,42 @@ end
 # Required args may not have default values.
 # ('Default' means "what to give it if not provided",
 # but required args must be provided.)
+#
 args_for :action2
   req(:foo).default('bar')
 end
     
 # In this case, the default value ('true') is of the wrong type.
 # (It should be an int.)
+#
 args_for :action3
   opt(:id).as(:int).default(true)
 end
     
 # The default value (:books) doesn't validate (because `#validate_in`
 # is mistakenly looking for a String, not a Symbol).
+#
 args_for :action4
   opt(:vertical).as(:symbol).default(:books).validate_in(['books', 'games'])
 end
+
+# The 'munge' block should accept only one argument, not two.
+# This will raise a ConfigError, complaining of an arity error.
+#
+args_for :action5
+  opt(:foo).munge {|a,b| a+b }
+end
+
+# This *is* an invalid declaration, because the 'munge' block attempts
+# to call #:+ on a boolean.  However, ActionArgs doesn't notice this
+# type of declaration error until runtime, when the actual argument is
+# passed in.  Had the parameter been an 'opt' arg with a specified
+# default, then ActionArgs would have caught the error.
+#
+args_for :action6
+  req(:should_filter).as(:bool).munge {|b| b + 3 }
+end
+
 ````
 
 ActionArgs can't always know when you've made a mistake, but when it
