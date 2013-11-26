@@ -21,11 +21,17 @@ module ActionArgs
         raise ConfigError, "Argument name #{name.inspect} must be symbol."
       end
       @name = param_name
-      @type_name = :string  # default type.  override w/ #as.
-      @munger = ->(b) {b}   # default munger (identify).  override w/ #munge
+      @type_name = :string      # default: :string. override w/ #as.
+      @munger    = ->(b) {b}    # default: :id.     override w/ #munge.
+      @validator = ->(_) {true} # default: :no-op.  override w/ #validate.
     end
 
-    # :: symbol -> ArgCfg (mutated)
+    # Takes a Symbol, the name of the argument type.
+    # If it's among the valid argument types, set @type_name.
+    # Else, raise.
+    #
+    # May raise.
+    # :: Symbol -> ArgCfg (mutated)
     def as(type_name)
       case type_name
       when *TYPE_NAMES
@@ -40,9 +46,15 @@ module ActionArgs
       self
     end
 
-    # Munge is meant to be used to normalize the input.
-    # For example, to downcase strings.
-    # But it should maintain type.
+    # Takes a pure function :: a -> a.  Any of:
+    #   + symbol (method name)
+    #   + proc/lambda
+    #   + block
+    #
+    # This function should expect the value to be
+    # already converted to its proper type.
+    # It should normalize the value; e.g. to downcase strings.
+    # It should maintain type.
     #
     # :: symbol|proc, block -> ArgCfg (mutated)
     def munge(sym_or_proc=nil, &block)
@@ -50,12 +62,25 @@ module ActionArgs
       self
     end
 
+    # Takes a pure function :: a -> bool.  Any of:
+    #   + symbol (method name)
+    #   + proc/lambda
+    #   + block
+    #
+    # This function should expect the value to be
+    # already converted to its proper type.
+    #
     # :: symbol|proc, block -> ArgCfg (mutated)
     def validate(sym_or_proc=nil, &block)
       @validator = get_proc(:validate, sym_or_proc, block)
       self
     end
 
+    # Takes an Array|Range or other object with responds_to #include?
+    # 
+    # The argument value will first be converted to its proper type
+    # and then checked for membership in 'valid_values'.
+    #
     # :: Array | Range -> ArgCfg (mutated)
     def validate_in(valid_values)
       @valid_values = get_valid_values(valid_values)
@@ -66,7 +91,7 @@ module ActionArgs
     private
 
     # May raise.
-    # :: T implements include? -> T
+    # :: (a implements #include?) => a -> a
     def get_valid_values(values)
       if values.respond_to?(:include?)
         values
@@ -102,7 +127,7 @@ module ActionArgs
     # (i.e. number of args unknown).
     #
     # May raise.
-    # :: proc, symbol -> unit|raise
+    # :: proc, symbol -> unit | raise
     def validate_unarity(proc, method_name)
       if ![1, -1].include?(proc.arity)
         raise ConfigError, "Proc for #{@name.inspect}'s ##{method_name} has an " +

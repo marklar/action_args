@@ -7,9 +7,14 @@ module ActionArgs
       true
     end
 
-    # :: 'a -> raises
+    # Because this is a Required parameter,
+    # attempting to provide it with a default value makes no sense.
+    # Raises ConfigError.
+    # 
+    # :: a -> raises
     def default(value)
-      raise ConfigError, "Required arg #{@name.inspect} may not accept a default value."
+      n = @name.inspect
+      raise ConfigError, "Required arg #{n} may not accept a default value."
     end
 
   end

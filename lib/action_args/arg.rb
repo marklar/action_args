@@ -20,13 +20,13 @@ module ActionArgs
       validate
     end
 
-    # :: -> bool
+    # :: () -> bool
     # True if a non-nil value was provided for this parameter.
     def provided?
       !@str.nil?
     end
 
-    # :: -> bool
+    # :: () -> bool
     # If a value was supplied for this parameter, return true if it passes
     # all validation:
     #   - is in range for type
@@ -36,7 +36,7 @@ module ActionArgs
       if !value.nil?
         in_range_for_type? &&
           among_validate_in_values? &&
-          (@cfg.validator ? @cfg.validator.call(value) : true)
+          @cfg.validator.call(value)
       else
         true
       end
@@ -52,7 +52,7 @@ module ActionArgs
     end
 
     # NOT DRY.  Same as in opt_arg_cfg.rb.
-    # :: -> bool
+    # :: () -> bool
     def in_range_for_type?
       case @cfg.type_name
       when :positive_int
@@ -81,7 +81,7 @@ module ActionArgs
       end
     end
 
-    # :: -> unit | raises
+    # :: () -> unit | raises
     def validate
       unless valid?
         n = @cfg.name.inspect
@@ -90,12 +90,12 @@ module ActionArgs
       end
     end
 
-    # :: -> valid-type | raises
+    # :: () -> valid-type | raises
     def calc_value
       @cfg.munger.call(to_type)
     end
 
-    # :: -> valid-type | exc
+    # :: () -> valid-type | exc
     # Takes (implicitly) the input String (@str) and returns a new value
     # by converting it to the proper type (e.g. Bool, Int, Float, Symbol).
     def to_type
@@ -121,25 +121,14 @@ module ActionArgs
         raise ConfigError, "Type not yet supported: #{@cfg.type_name}."
       end
     end
-
-    # :: s -> bool | raises
-    def bool_from_str(s)
-      raise exc unless valid_bool_str?(s)
-      case s
-      when *FALSE_STRS
-        false
-      else
-        true
-      end
-    end
-
-    # :: -> ArgumentError
+    
+    # :: () -> ArgumentError
     def exc
       ArgumentError.new("Arg value #{@str} isn't a valid #{@cfg.type_name}.")
     end
 
 =begin
-    # :: -> [float] | raises
+    # :: () -> [float] | raises
     def floats_from_csv_str
       float_strs = @str.gsub(' ', '').split(',')
       unless float_strs.all? {|s| valid_float_str?(s) }
@@ -148,7 +137,7 @@ module ActionArgs
       float_strs.map {|s| s.to_f }
     end
 
-    # :: -> [int] | raises
+    # :: () -> [int] | raises
     def ints_from_csv_str
       int_strs = @str.gsub(' ', '').split(',')
       unless int_strs.all? {|s| valid_int_str?(s) }
@@ -158,12 +147,12 @@ module ActionArgs
     end
 =end
 
-    # :: -> [float] | raises
+    # :: () -> [float] | raises
     def floats_from_csv_str
       nums_from_csv_str(:valid_float_str?, :to_f)
     end
 
-    # :: -> [int] | raises
+    # :: () -> [int] | raises
     def ints_from_csv_str
       nums_from_csv_str(:valid_int_str?, :to_i)
     end
@@ -172,7 +161,7 @@ module ActionArgs
       num_strs = @str.gsub(' ', '').split(',')
       unless num_strs.all? {|s| send(validate, s) }
         raise ArgumentError,
-          "In arg value #{@s}, not all members are of valid type."
+          "In arg value #{@str}, not all members are of valid type."
       end
       num_strs.map {|s| s.send(converter) }
     end
@@ -186,8 +175,11 @@ module ActionArgs
     def valid_float_str?(str)
       str =~ /^[+\-]?[\d\.]*$/   # optional sign, then only digits OR '.'
     end
-    
-    # :: -> string
+
+    # Really not necessary to memoize this value,
+    # as it only ever gets called once per instance.
+    #
+    # :: () -> string
     def cleaned_num_str
       @cleaned_num_str ||= sans_whitespace_and_commas
     end
@@ -195,11 +187,15 @@ module ActionArgs
     # String#to_i and #to_f stop parsing when they sees a space
     # (after the first digit).
     # Does not support the use of '.' as a 1000s-separator.
-    # :: -> string
+    #
+    # :: () -> string
     def sans_whitespace_and_commas
       @str.gsub(' ', '').gsub(',', '')
     end
-    
+
+    # Create an ArgumentError (exception) object,
+    # based on the argument's configuration and the provided value.
+    #
     # :: string -> exc  (doesn't raise)
     def not_string_exc(str)
       n = @cfg.name.inspect
@@ -207,7 +203,19 @@ module ActionArgs
       ArgumentError.new("Arg #{n}'s value must be a String: #{v}.")
     end
 
-    # :: -> bool
+    # May raise.
+    # :: string -> bool
+    def bool_from_str(s)
+      raise exc unless valid_bool_str?(s)
+      case s
+      when *FALSE_STRS
+        false
+      else
+        true
+      end
+    end
+
+    # :: () -> bool
     def valid_bool_str?(str)
       BOOL_STRS.include?(str)
     end

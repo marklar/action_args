@@ -137,7 +137,14 @@ Or, ["Pulling Args from Params"][4].
 
 ### Plugin
 
-First, include the plugin:
+First, include ActiveArgs in your RoR application by adding this line
+to your Gemfile:
+
+```ruby
+gem 'action_args', git: 'git://github.com/marklar/action_args.git'
+```
+
+Then, include the mixin ArgyBargy in your ApplicationController:
 
 ```ruby
 # app/controllers/application.rb
@@ -145,6 +152,10 @@ class ApplicationController < ActionController::Base
   include ActionController::ArgyBargy
 end
 ````
+
+ArgyBargy adds the class method `.args_for` which you'll use to
+declare your parameters...
+
 
 ### Declare Your Args
 
@@ -218,14 +229,14 @@ ActionArgs tries to cover the most common patterns.
 
 Using `#as`, you may declare an argument to be any of these types:
 
-* simple
-  * `:bool`          (false: `'f'`, `'false'`, `'0'`.  true: `'t'`, `'true'`, `'1'`.)
-  * `:float`
+* fundamental
+  * `:bool`          (false: `['f', 'false', '0']`.  true: `['t', 'true', '1']`.)
   * `:int`
-  * `:positive_int`  (i.e. >  0)
-  * `:unsigned_int`  (i.e. >= 0)
+  * `:positive_int`  (i >  0)
+  * `:unsigned_int`  (i >= 0)
+  * `:float`
   * `:string`        (_default_)
-  * `:symbol`        (great for enums)
+  * `:symbol`        (for enums)
 * arrays
   * `:float_array`
   * `:int_array`
@@ -233,9 +244,9 @@ Using `#as`, you may declare an argument to be any of these types:
   * `:unsigned_int_array`
 
 If you declare something as `:positive_int` or `:unsigned_int`, or an
-`_array` of either of those types, then ActionArgs essentially handles
-part of your validation for you.  However, you are not restricted from
-providing additional validation criteria.
+`_array` of either of those fundamental types, then ActionArgs
+essentially handles part of your validation for you.  However, you are
+not restricted from providing additional validation criteria.
 
 You are not required to assign a type using `#as`.  If you don't
 declare a type, it will simply remain a String.
