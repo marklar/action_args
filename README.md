@@ -175,14 +175,17 @@ class BojacksController < ApplicationController
   VERTICALS = [:books, :games, :other_crap]
     
   args_for :my_action do
+
     # Required arg called :vertical.  (If absent: ActionArgs::ArgumentError.)
     # Value is a Symbol (converted from supplied String).
     # Ensure value's validity or raise ActionArgs::ArgumentError.
+    #
     req(:vertical).as(:symbol).validate_in(VERTICALS)
 
     # Optional string arg called :filter.
     # If provided, its value is downcased automatically.
     # If not provided, its value is nil.  (The "default default" is nil.)
+    #
     opt(:filter).as(:string).munge(:downcase)
 
     # Optional hash called :paging.
@@ -195,20 +198,30 @@ class BojacksController < ApplicationController
     #
     # In this case, the hash is optional.  But if present,
     # both of its members are required.
+    #
     opt_hash(:paging) do
       # If :paging hash is present...
-    
+
       # Required int (Fixnum, really) called :offset.
       # Must be non-negative (or raises ActionArgs::ArgumentError).
-      req(:offset).as(:unsigned_int)
+      #
+      # We then increment it (with :next), because (let's pretend)
+      # in our app we really want to use indices starting at 1, not 0.
+      # Instead of :next, We could equally well have used:
+      #   * a lambda: ->(i) {i+1}
+      #   * a block:  {|i| i+1}
+      #
+      req(:offset).as(:unsigned_int).munge(:next)
     
       # Required int called :limit.
       # Must be positive (or raises ActionArgs::ArgumentError).
-      req(:limit).as(:positive_int).
+      #
+      req(:limit).as(:positive_int)
     end
     
     # Optional boolean arg called :show_related_p.
     # If absent, default value is false.
+    #
     opt(:show_related_p).as(:bool).default(false)
   end
 
@@ -257,11 +270,21 @@ simple types.  Just haven't gotten there; could do.)
 #### Munging using `#munge`
 
 You may specify how to normalize an argument by providing a "munge"
-function, specified either as a proc/lambda, or as a symbol
-(i.e. method name).
+function, specified as a block, a proc/lambda, or as a symbol
+(i.e. method name).  For example:
 
-You may specify only one "munge" function.  If you call `#munge` more
-than once, the last one "wins".
+As a block (preferred):
+```ruby
+req(:some_string).munge {|s| s.gsub(' ', '_') }
+```
+
+Or as a lambda:
+```ruby
+req(:some_string).munge ->(s) { s.gsub(' ', '_') }
+```
+
+It does not work to specify more than a single "munge" function per
+parameter.  If you call `#munge` more than once, the last one "wins".
 
 #### Validation using `#validate` or `#validate_in`
 
