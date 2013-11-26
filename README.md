@@ -270,23 +270,31 @@ simple types.  Just haven't gotten there; could do.)
 #### Munging using `#munge`
 
 You may specify how to normalize an argument by providing a "munge"
-function, specified as a block, a proc/lambda, or as a symbol
-(i.e. method name).  For example:
+function.
 
-As a block (preferred):
+If your munging is simply a unary instance method on the value, you
+may use just the :name of it, like this:
+
+```ruby
+req(:some_string).munge(:downcase)
+```
+
+You may instead provide a block:
+
 ```ruby
 req(:some_string).munge {|s| s.gsub(' ', '_') }
 ```
 
-Or as a lambda:
+Or, if it's convenient for you, a lambda:
+
 ```ruby
 some_reusable_lambda = ->(s) { s.gsub(' ', '_') }
 ...
 req(:some_string).munge(some_reusable_lambda)
 ```
 
-It does not work to specify more than a single "munge" function per
-parameter.  If you call `#munge` more than once, the last one "wins".
+Specifying more than a single "munge" function per parameter does not
+work.  If you call `#munge` more than once, the last one "wins".
 
 #### Validation using `#validate` or `#validate_in`
 
