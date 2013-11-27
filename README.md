@@ -25,7 +25,8 @@ args_for :my_action do
   # If provided, downcase it.
   # If missing, defaults to :name.
   opt(:sort).as(:symbol).default(:name).
-    munge(:downcase).validate_in([:name, :time])
+    munge(:downcase).
+    validate_in [:name, :time]
 end
 
 # Then, use the 'args' in your action...
