@@ -5,7 +5,7 @@ module ActionArgs
   #
   # Also, ABSTRACT base class for
   # config for a single hash-like argument,
-  # either required (ReqHashCfg) or optional (OptReqCfg).
+  # either required (ReqHashCfg) or optional (OptHashCfg).
   # Those classes override NOTHING;
   # We simply branch behavior based on their classes.
   #

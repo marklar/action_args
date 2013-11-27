@@ -32,7 +32,7 @@ module ActionController
       # Create the args config for a method.
       # Store in class-variable hash, for use by #access_args before_filter.
       # :: symbol, block -> unit
-      def args_for(action_name_sym, opts={:raise_p => true}, &block)
+      def args_for(action_name_sym, opts={raise_p: true}, &block)
         cfg = class_variable_get(:@@args_cfg)
         cfg[self] ||= {}
         cfg[self][action_name_sym.to_s] =

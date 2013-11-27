@@ -24,14 +24,20 @@ args_for :my_action do
   # We may get an arg "filter", a Symbol.
   # If provided, downcase it.
   # If missing, defaults to :name.
-  opt(:sort).as(:symbol).default(:name).munge(:downcase)
+  opt(:sort).as(:symbol).default(:name).
+    munge(:downcase).validate_in([:name, :time])
 end
 
 # Then, use the 'args' in your action...
 def my_action
   # Use 'args' here, kinda like 'params', except already
   # type-converted, default-valued, and validated.
-  ...
+  case args[:sort]
+  when :name
+    ...
+  when :time
+    ...
+  end
 end
 
 ```
