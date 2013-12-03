@@ -85,7 +85,7 @@ module ActionArgs
           # Use @params to create: Accessor|Arg.
           memo[cfg.name] = create_either_accessor_or_arg(cfg)
           # If Accessor, might have own errors.  Note them.
-          note_any_accessor_errors(memo[cfg.name])
+          note_any_accessor_errors(cfg, memo[cfg.name])
         rescue Exception => e
           memo[cfg.name] = nil
           @errors[cfg.name] = e
@@ -113,7 +113,7 @@ module ActionArgs
     # Possibly modify @errors.
     # May raise.
     # :: Accessor|Arg >> ()
-    def note_any_accessor_errors(acc_or_arg)
+    def note_any_accessor_errors(cfg, acc_or_arg)
       case acc_or_arg
       when Accessor
         if !acc_or_arg.valid?
