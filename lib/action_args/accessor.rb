@@ -18,6 +18,9 @@ module ActionArgs
     # params:  { symbol => string }
     # :: Hash, HashCfg -> Accessor
     def initialize(params, config)
+      if params.nil?
+        raise(ArgumentError, "Required arguments are missing.")
+      end
       @params = params
       @config = config
       @errors = {}

@@ -21,6 +21,18 @@ class AccessorTest < Test::Unit::TestCase
     end
   end
 
+  def test_required_hash_present
+    @cfg = ReqHashCfg.new do
+      req(:a)
+      req(:b)
+    end
+    # params = {a: 'a', b: 'b'}
+    params = nil
+    assert_raises ArgumentError do
+      acc = Accessor.new(params, @cfg)
+    end
+  end
+
   def test_foo
     @cfg = HashCfg.new do
       at_least_one_of do
