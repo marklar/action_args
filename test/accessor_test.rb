@@ -33,7 +33,7 @@ class AccessorTest < Test::Unit::TestCase
     end
   end
 
-  def test_foo
+  def test_inner_req_not_valid
     @cfg = HashCfg.new do
       at_least_one_of do
         opt(:listing_id).as(:positive_int)
