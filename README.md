@@ -3,7 +3,7 @@
 ActionArgs is a Ruby on Rails plugin.  A declarative DSL for
 your controller actions.
 
-A quick _examplet_:
+First, a quick example:
 
 ```ruby
 # First, declare the formal parameters for your action...
@@ -259,9 +259,9 @@ required or optional.
 
 ```ruby
 #
-# Will accept either:
-#   login?credentials[username]=foo&password=bar
-#   login?credentials[email]=foo@quux.com&password=bar
+# Will accept either of these (spaces added for readability):
+#   login? credentials[username]=foo       & password=bar
+#   login? credentials[email]=foo@quux.com & password=bar
 #
 args_for :login do
   req_hash(:credentials) do
