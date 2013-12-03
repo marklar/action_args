@@ -259,7 +259,7 @@ required or optional.
 
 ```ruby
 #
-# Will accept either of these (spaces added for readability):
+# Will accept either of these (spaces added for legibility):
 #   login? credentials[username]=foo       & password=bar
 #   login? credentials[email]=foo@quux.com & password=bar
 #
