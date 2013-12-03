@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    action-args (0.0.1)
+    action_args (0.0.1)
       rails (~> 4.0.1)
 
 GEM
@@ -95,7 +95,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  action-args!
+  action_args!
   pry
   pry-doc
   sqlite3
