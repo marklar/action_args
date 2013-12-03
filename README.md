@@ -243,9 +243,32 @@ class BojacksController < ApplicationController
 end
 ```
 
-ActionArgs tries to cover the most common patterns.
+#### Optional or Required?
+
+Within your `args_for` block, you may specify whether arguments are
+required or optional.
+
+* independent args
+  * `req`
+  * `opt`
+* hash args
+  * `req_hash`
+  * `opt_hash`
+* groups of inter-related args
+  * `at_least_one_of` - Unlike the other declarations, `at_least_one_of` doesn't take an argument name.  It takes only a block, within which one defines only `opt` or `opt_hash` arguments.  For example:
+
+```ruby
+args_for :foo do
+  at_least_one_of do
+    opt(:username).as(:string)
+    opt(:email_address).as(:string)
+  end
+end
+```
 
 #### Types using `#as`
+
+ActionArgs tries to cover the most common patterns.
 
 Using `#as`, you may declare an argument to be any of these types:
 
