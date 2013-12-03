@@ -1,4 +1,4 @@
-require "action_args/init"
+require "action-args/init"
  
 module ActionArgs
 end
