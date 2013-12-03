@@ -258,19 +258,27 @@ required or optional.
   * `at_least_one_of` - Unlike the other declarations, `at_least_one_of` doesn't take an argument name.  It takes only a block, within which one defines only `opt` or `opt_hash` arguments.  For example:
 
 ```ruby
-args_for :foo do
-  at_least_one_of do
-    opt(:username).as(:string)
-    opt(:email_address).as(:string)
+#
+# Will accept either:
+#   login?credentials[username]=foo&password=bar
+#   login?credentials[email]=foo@quux.com&password=bar
+#
+args_for :login do
+  req_hash(:credentials) do
+    at_least_one_of do
+      opt(:username).as(:string)
+      opt(:email).as(:string)
+    end
+    req(:password).as(:string)
   end
 end
 ```
 
-#### Types using `#as`
+#### Types using `as`
 
 ActionArgs tries to cover the most common patterns.
 
-Using `#as`, you may declare an argument to be any of these types:
+Using `as`, you may declare an argument to be any of these types:
 
 * fundamental
   * `:bool`          (false: `['f', 'false', '0']`.  true: `['t', 'true', '1']`.)
@@ -291,13 +299,13 @@ If you declare something as `:positive_int` or `:unsigned_int`, or an
 essentially handles part of your validation for you.  However, you are
 not restricted from providing additional validation criteria.
 
-You are not required to assign a type using `#as`.  If you don't
+You are not required to assign a type using `as`.  If you don't
 declare a type, it will simply remain a String.
 
 (You may wonder why there aren't corresponding `_array` types for all
 simple types.  Just haven't gotten there; could do.)
 
-#### Munging using `#munge`
+#### Munging using `munge`
 
 You may specify how to normalize an argument by providing a "munge"
 function.
@@ -305,7 +313,7 @@ function.
 If your munging is simply a unary instance method on the value, you may simply provide its name, like this:
 
 ```ruby
-req(:some_string).munge(:downcase)
+req(:foo).munge(:downcase)
 ```
 
 That will call `String#downcase` on the passed-in value.
@@ -313,7 +321,7 @@ That will call `String#downcase` on the passed-in value.
 You may instead provide a block:
 
 ```ruby
-req(:some_string).munge {|s| s.gsub(' ', '_') }
+req(:foo).munge {|s| s.gsub(' ', '_') }
 ```
 
 NB: Don't use `#gsub!` here, because what you want is the munge
@@ -325,22 +333,22 @@ Or, if it's convenient for you, a lambda:
 ```ruby
 some_reusable_lambda = ->(s) { s.gsub(' ', '_') }
 ...
-req(:some_string).munge(some_reusable_lambda)
+req(:foo).munge(some_reusable_lambda)
 ```
 
 Specifying more than a single "munge" function per parameter does not
-work.  If you call `#munge` more than once, the last one "wins".
+work.  If you call `munge` more than once, the last one "wins".
 
-#### Validation using `#validate` or `#validate_in`
+#### Validation using `validate` or `validate_in`
 
-You may also specify a validation function using `#validate`, again
+You may also specify a validation function using `validate`, again
 either as a lambda/proc or as a symbol (i.e. method name).  As with
-`#munge`, do so only once per parameter.
+`munge`, do so only once per parameter.
 
 However, you probably won't. Since checking for set/enum membership is
 a very common validation case, ActionArgs also provides a special
-`#validate_in` method which you'll probably usually use.
-`#validate_in` takes either an Array or a Range.  (Note to self: it
+`validate_in` method which you'll probably usually use.
+`validate_in` takes either an Array or a Range.  (Note to self: it
 should probably also accept a Set.)  Like this:
 
 ```ruby
@@ -362,6 +370,7 @@ will raise an exception of type `ActionArgs::ConfigError`, explaining what it
 thinks you did wrong.  Here are some examples of invalid declarations:
 
 ```ruby
+#
 # The arg :foo is specified twice.
 #
 args_for :action1
@@ -369,6 +378,7 @@ args_for :action1
   opt(:foo).as(:int)
 end
 
+#
 # Required args may not have default values.
 # ('Default' means "what to give it if not provided",
 # but required args must be provided.)
@@ -376,21 +386,24 @@ end
 args_for :action2
   req(:foo).default('bar')
 end
-    
+ 
+#   
 # In this case, the default value ('true') is of the wrong type.
 # (It should be an int.)
 #
 args_for :action3
   opt(:id).as(:int).default(true)
 end
-    
-# The default value (:books) doesn't validate (because `#validate_in`
+ 
+#   
+# The default value (:books) doesn't validate (because `validate_in`
 # is mistakenly looking for a String, not a Symbol).
 #
 args_for :action4
   opt(:vertical).as(:symbol).default(:books).validate_in(['books', 'games'])
 end
 
+#
 # The 'munge' block should accept only one argument, not two.
 # This will raise a ConfigError, complaining of an arity error.
 #
@@ -398,6 +411,7 @@ args_for :action5
   opt(:foo).munge {|a,b| a+b }
 end
 
+#
 # This *is* an invalid declaration, because the 'munge' block attempts
 # to call #:+ on a boolean.  However, ActionArgs doesn't notice this
 # type of declaration error until runtime, when the actual argument is
@@ -428,7 +442,7 @@ options:
   by you, you're golden.
 * If you want your controller action to get called regardless of
   ActionArgs errors, then you'll need to add `raise_p: false` to
-  your `#args_for` declaration, like this:
+  your `args_for` declaration, like this:
 
 ```ruby
 args_for :my_action, raise_p: false do
@@ -436,7 +450,7 @@ args_for :my_action, raise_p: false do
 end
 ```
 
-If you tell `#args_for` not to raise, then your action code will be
+If you tell `args_for` not to raise, then your action code will be
 called, and you may ask of the args object what happened by inspecting
 the errors it gathered up in `args.errors`.  Here's an example:
 
