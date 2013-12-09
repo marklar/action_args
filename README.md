@@ -6,6 +6,8 @@ your controller actions.
 First, a quick example:
 
 ```ruby
+# in app/controllers/my_controller.rb
+
 # First, declare the formal parameters for your action...
 args_for :my_action do
 
@@ -148,6 +150,7 @@ First, include ActiveArgs in your RoR application by adding this line
 to your Gemfile:
 
 ```ruby
+# Gemfile
 gem 'action_args', git: 'git://github.com/marklar/action_args.git'
 ```
 
@@ -258,6 +261,8 @@ required or optional.
   * `at_least_one_of` - Unlike the other declarations, `at_least_one_of` doesn't take an argument name.  It takes only a block, within which one defines only `opt` or `opt_hash` arguments.  For example:
 
 ```ruby
+# in app/controllers/my_controller.rb
+
 #
 # Will accept either of these (spaces added for legibility):
 #   login? credentials[username]=foo       & password=bar
