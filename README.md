@@ -148,7 +148,7 @@ First, include ActiveArgs in your RoR application by adding this line
 to your Gemfile:
 
 ```ruby
-gem 'action-args', git: 'git://github.com/marklar/action-args.git'
+gem 'action_args', git: 'git://github.com/marklar/action_args.git'
 ```
 
 Then, include the mixin ArgyBargy in your ApplicationController:
